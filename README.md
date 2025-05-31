@@ -16,3 +16,10 @@ J. J. Bird and A. Lotfi, "CIFAKE: Image Classification and Explainable Identific
 - **60,000 synthetic images** generated with Stable Diffusion v1.4 to replicate CIFAR-10 categories.
 - All images are RGB, 32×32 pixels.
 - Split: 50,000 real + 50,000 fake for training, 10,000 real + 10,000 fake for testing.
+
+## How to run
+
+```bash
+conda env create -f environment.yml
+conda activate cifake
+```
