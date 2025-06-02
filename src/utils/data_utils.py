@@ -1,5 +1,6 @@
 import os
 
+from enum import Enum
 from typing import Tuple
 from kagglehub import dataset_download
 from torchvision import datasets, transforms
@@ -16,6 +17,13 @@ __BASE_LOCAL_DATA_PATHS = [
     ("../data/test/REAL", 10000),
     ("../data/test/FAKE", 10000)
 ]
+
+class ModelType(Enum):
+    GENERAL = "general"
+    EFFICIENTNET_B0 = "efficientnet_b0"
+    RESNET50 = "resnet50"
+    XCEPTION = "xception"
+
 
 def _check_folder(path: str) -> Tuple[bool, int]:
     if not os.path.isdir(path):
@@ -37,7 +45,53 @@ def _is_dataset_present() -> bool:
     return True
 
 
-def load_and_preprocess_data(resize_to: Tuple[int, int] = (32, 32), keras_format: bool = False):
+def _to_keras_format(x):
+    return x.permute(1, 2, 0)
+
+
+def _get_preprocessing_transforms(model_type: ModelType,
+                                  resize_to: Tuple[int, int],
+                                  keras_format: bool = False):
+    
+    transform_list = [transforms.Resize(resize_to)]
+    
+    if model_type == ModelType.EFFICIENTNET_B0:
+        # EfficientNet-B0 precisa de 224x224
+        transform_list.extend([
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ])
+    
+    elif model_type == ModelType.RESNET50:
+        # ResNet50 usa 224x224 como padrão
+        transform_list.extend([
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ])
+    
+    elif model_type == ModelType.XCEPTION:
+        # Xception precisa de 299x299 idealmente
+        # Xception usa normalização com valores entre -1 e 1
+        transform_list.extend([
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
+        ])
+    
+    else:
+        transform_list.extend([
+            transforms.ToTensor()
+        ])
+    
+    # Converter para formato Keras se necessário (CHW -> HWC)
+    if keras_format:
+        transform_list.append(transforms.Lambda(_to_keras_format))
+    
+    return transforms.Compose(transform_list)
+
+
+def load_and_preprocess_data(resize_to: Tuple[int, int] = (32, 32),
+                             keras_format: bool = False,
+                             model_type: ModelType = ModelType.GENERAL):
     """
     Carrega e faz o pré-processamento do CIFAKE dataset. Caso não esteja presente, baixa do kaggle.
 
@@ -53,15 +107,7 @@ def load_and_preprocess_data(resize_to: Tuple[int, int] = (32, 32), keras_format
         train_path = f"{path}/cifake/train"
         test_path = f"{path}/cifake/test"
 
-    transform_list = [
-        transforms.Resize(resize_to),
-        transforms.ToTensor()
-    ]
-
-    if keras_format:
-        transform_list.append(transforms.Lambda(lambda x: x.permute(1, 2, 0)))
-
-    transform = transforms.Compose(transform_list)
+    transform = _get_preprocessing_transforms(model_type, resize_to, keras_format)
 
     return (
         datasets.ImageFolder(root=train_path, transform=transform),
