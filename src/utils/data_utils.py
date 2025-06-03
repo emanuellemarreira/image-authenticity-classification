@@ -1,10 +1,12 @@
 import os
+import tensorflow as tf
 
 from enum import Enum
 from typing import Tuple
 from kagglehub import dataset_download
 from torchvision import datasets, transforms
 
+from torch.utils.data import Subset, DataLoader, ConcatDataset, random_split
 
 # Detalhe
 # Pytorch    -> [canal, altura, largura]
