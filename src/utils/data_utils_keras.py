@@ -19,6 +19,8 @@ class ModelType(Enum):
     EFFICIENTNET_B0 = "efficientnet_b0"
     RESNET50 = "resnet50"
     XCEPTION = "xception"
+    MOBILENET_V2 = "mobilenet_v2"
+    SHUFFLENET_V2 = "shufflenet_v2"
 
 
 def _check_folder(path: str) -> Tuple[bool, int]:
@@ -55,6 +57,13 @@ def _get_tf_preprocess_fn(model_type: ModelType,
         elif model_type == ModelType.XCEPTION:
             # Normalização para [-1, 1]
             image = (image - 0.5) * 2.0
+
+        elif model_type == ModelType.MOBILENET_V2:
+            image = (image - 0.5) * 2.0 
+
+        elif model_type == ModelType.SHUFFLENET_V2:
+            image = tf.cast(image, tf.float32) / 255.0  # o mesmo que GENERAL
+
 
         return image, label
 
