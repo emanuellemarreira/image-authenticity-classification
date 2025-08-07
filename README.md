@@ -55,7 +55,8 @@ conda activate cifake
 5. Ítalo Ferreira Fonseca | ItaloFonseca
 6. João Vitor Silva De Carvalho | joaov1524@gmail.com | joaocarvalhov
 7. Lilian Iazzai De Souza Oliveira | lilianiazzai@gmail.com | lilianiazzai
-8. Vitor Nascimento Aguiar | Vtaguiar1909 
+8. Vitor Nascimento Aguiar | Vtaguiar1909
+9. Afonso Ramos Garcia Neto | afonso.ramos3180@gmail.com | afonso3180
 
 ---
 
